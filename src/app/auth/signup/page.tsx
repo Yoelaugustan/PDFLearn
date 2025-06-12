@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Menu from '../../../components/Menu'
 import * as Icons from "@heroicons/react/24/solid";
 import { Icon } from 'lucide-react';
-import Google from '@/themes/icons';
+import { Google } from '@/themes/icons';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useAuthenticationActions } from '@/hooks/useAuthenticationActions';
@@ -39,9 +39,12 @@ export default function signup() {
     }
   return (
     <div className='flex flex-col min-h-screen bg-[#0D1117]'>
-        <Menu />
+        <div className='flex flex-1 flex-col justify-center items-center'>
+            <div className="mb-8 flex items-center justify-center">
+                <Icons.DocumentTextIcon className="h-10 w-10 text-[#D1D5DB]"/>
+                <h1 className="text-3xl font-bold text-[#D1D5DB]">PDFLearn</h1>
+            </div>
 
-        <div className='flex flex-1 justify-center items-center'>
             <div className='bg-[#0D1117] border border-[#30363D] rounded-2xl px-14 py-12 shadow-md shadow-[#D1D5DB]'>
                 
                 <h1 className='text-3xl font-semibold text-center text-[#D1D5DB] mb-2'>Welcome</h1>
