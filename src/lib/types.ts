@@ -6,3 +6,8 @@ export type CardProps = {
     title: string
     description: string
 }
+
+export type DropzoneProps = {
+    onFileSelected?: (file: File) => void
+    onContinue?: (file: File) => void
+}
