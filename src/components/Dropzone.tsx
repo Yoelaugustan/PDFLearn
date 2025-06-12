@@ -1,12 +1,23 @@
 'use client'
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {useDropzone} from 'react-dropzone';
 import * as Icons from '@heroicons/react/24/solid'
 import { DropzoneProps } from '@/lib/types';
 import { Button } from './ui/button';
+import { usePdfScanner } from '@/hooks/usePDFScanner';
 
 export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
   const [file, setFile] = useState<File | null>(null)
+  const [scanFile, setScanFile] = useState<File | null>(null)
+
+  const { progress, text, done, error } = usePdfScanner(scanFile)
+
+  useEffect(() => {
+    if (done && scanFile) {
+      console.log('🎉 Scanning done! Extracted text:', text)
+      onContinue?.(scanFile, text)
+    }
+  }, [done, scanFile, onContinue, text])
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -87,13 +98,29 @@ export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
       {file && (
         <div className="mt-4 text-center">
           <Button 
-            onClick={() => onContinue?.(file)}
+            onClick={() => setScanFile(file)}
             className='bg-[#3B82F6] hover:bg-[#2563EB] text-[#0D1117] font-medium text-sm sm:text-base py-4 sm:py-5 w-full max-w-xs sm:max-w-sm md:max-w-md rounded-xl'
           >
             <p className='w-full text-center block'>Continue</p>
           </Button>
         </div>
       )}
+
+      {scanFile && !done && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex flex-col items-center justify-center p-4">
+          <img src='/Scanning.gif' alt="Scanning…" className="w-24 h-24 mb-6" />
+          <div className="w-full max-w-md bg-gray-700 rounded-full h-2 overflow-hidden mb-2">
+            <div
+              className="h-full bg-green-500 transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-white">{progress}%</p>
+          {error && <p className="text-red-400 mt-2">{error}</p>}
+        </div>
+      )}
     </div>
+
+    
   );
 }
