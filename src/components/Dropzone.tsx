@@ -5,17 +5,22 @@ import * as Icons from '@heroicons/react/24/solid'
 import { DropzoneProps } from '@/lib/types';
 import { Button } from './ui/button';
 import { usePdfScanner } from '@/hooks/usePDFScanner';
+import { useRouter } from 'next/navigation';
+import { useDocumentUpload } from '@/hooks/useDocumentUpload'
 
 export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
   const [file, setFile] = useState<File | null>(null)
   const [scanFile, setScanFile] = useState<File | null>(null)
+  const router = useRouter()
 
   const { progress, text, done, error } = usePdfScanner(scanFile)
+  const { uploadDocument, uploading, error: uploadError } = useDocumentUpload()
+
 
   useEffect(() => {
     if (done && scanFile) {
-      console.log('🎉 Scanning done! Extracted text:', text)
-      onContinue?.(scanFile, text)
+      sessionStorage.setItem('pdfText', text)
+      uploadDocument(scanFile, text)
     }
   }, [done, scanFile, onContinue, text])
 
