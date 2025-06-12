@@ -59,21 +59,21 @@ export default function Landing() {
     <div className="bg-[#0D1117] min-h-screen flex flex-col">
       <Menu />
 
-      <div className="flex-1 flex flex-col justify-center items-center py-15 px-4 space-y-16">
+      <div className="flex-1 flex flex-col justify-center items-center py-8 md:py-15 px-4 space-y-12 md:space-y-16">
         {/* Get Started */}
-        <div className="flex flex-col items-center space-y-6">
-          <h1 className="text-3xl font-semibold text-center text-[#D1D5DB]">
+        <div className="flex flex-col items-center space-y-4 md:space-y-6 w-full max-w-4xl">
+          <h1 className="text-2xl md:text-3xl font-semibold text-center text-[#D1D5DB] px-4">
             Get Started Now
           </h1>
           <Dropzone />
         </div>
 
         {/* What is PDFLearn */}
-        <div className="flex flex-col items-center space-y-6">
-          <h2 className="text-3xl font-semibold text-center text-[#D1D5DB]">
+        <div className="flex flex-col items-center space-y-4 md:space-y-6 w-full max-w-6xl">
+          <h2 className="text-2xl md:text-3xl font-semibold text-center text-[#D1D5DB] px-4">
             What is PDFLearn?
           </h2>
-          <p className="text-[#D1D5DB] max-w-2xl text-center">
+          <p className="text-[#D1D5DB] max-w-2xl text-center text-sm md:text-base px-4">
             PDFLearn is a smart web app that helps you learn faster from your documents. Just upload a PDF,
             and our AI will read it, understand it, and let you choose what you want next.
           </p>
@@ -89,50 +89,51 @@ export default function Landing() {
             ))}
           </div>
 
-          <p className="text-[#D1D5DB] max-w-2xl text-center">
+          <p className="text-[#D1D5DB] max-w-2xl text-center text-sm md:text-base px-4">
             Whether you're a student reviewing lecture notes or a professional going through reports,
             PDFLearn helps you save time and study smarter — no need to copy-paste or highlight manually,
             just drop your file and let the AI do the rest.
           </p>
         </div>
 
-        {/* How It Works */}
-        <div className="flex flex-col items-center space-y-6">
-          <h2 className="text-3xl font-semibold text-center text-[#D1D5DB]">
+        {/* How PDFLearn Works */}
+        <div className="flex flex-col items-center space-y-6 w-full max-w-6xl">
+          <h2 className="text-2xl md:text-3xl font-semibold text-center text-[#D1D5DB] px-4">
             How PDFLearn Works
           </h2>
 
-          <div className="flex items-center w-full max-w-3xl justify-between">
-            {steps.map((s, i) => (
-              <React.Fragment key={s.number}>
-                <div className="flex flex-col items-center">
-                  <div className="h-10 w-10 rounded-full border border-gray-500 text-gray-300 flex items-center justify-center">
-                    {s.number}
-                  </div>
-                </div>
-                {i < steps.length - 1 && <div className="flex-1 h-px bg-gray-600 mx-2" />}
-              </React.Fragment>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-11 justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-4 mt-5">
             {steps.map((s) => (
-              <Card
-                key={s.number}
-                Icon={s.icon}
-                title={s.title}
-                description={s.desc}
-              />
+              <div key={s.number} className="relative">
+                <div
+                  className="
+                    absolute -top-5 left-1/2 transform -translate-x-1/2
+                    bg-[#0D1117] border-2 border-[#D1D5DB]
+                    rounded-full w-10 h-10
+                    flex items-center justify-center
+                    text-sm text-[#D1D5DB]
+                    z-20
+                  "
+                >
+                  {s.number}
+                </div>
+
+                <Card
+                  Icon={s.icon}
+                  title={s.title}
+                  description={s.desc}
+                />
+              </div>
             ))}
           </div>
         </div>
 
         <Button 
-          className='relative bg-[#3B82F6] hover:bg-[#2563EB] text-[#0D1117] font-medium text-base py-5 w-[15%] rounded-xl'
+          className='relative bg-[#3B82F6] hover:bg-[#2563EB] text-[#0D1117] font-medium text-sm md:text-base py-4 md:py-5 w-full max-w-xs md:w-[35%] lg:w-[20%] rounded-xl mx-4'
           onClick={scrollToTop}
         >
           <p className='w-full text-center block'>Get Started Now</p>
-          <Icons.ChevronRightIcon className='absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5'/>
+          <Icons.ChevronRightIcon className='absolute right-4 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5'/>
         </Button>
       </div>
 
