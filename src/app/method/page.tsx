@@ -1,9 +1,11 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Card from '@/components/card'
 import * as Icons from '@heroicons/react/24/solid'
 import { Button } from '@/components/ui/button'
+import { useGenerateMethod } from '@/hooks/useGenerateMethod'
+import Loading from '@/components/Loading'
 
 const methods = [
     { 
@@ -24,19 +26,35 @@ const methods = [
         description: 'Turn important info into easy-to-review flashcards',      
         Icon: Icons.RectangleStackIcon 
     },
-]
+] as const
+
+type MethodKey = (typeof methods)[number]['key']
 
 export default function method() {
-    const [selected, setSelected] = useState<string | null>(null)
+    const [selected, setSelected] = useState<MethodKey | null>(null)
     const router = useRouter()
+    const { generate, loading, output, error } = useGenerateMethod()
+
+    useEffect(() => {
+        if (!loading && output) {
+            sessionStorage.setItem(`pdf_${selected}`, JSON.stringify(output))
+            router.push(`/${selected}`)
+        }
+    }, [loading, output, selected, router])
+
+    const handleContinue = () => {
+        const text = sessionStorage.getItem('pdfText')
+        if (!selected || !text) return
+        generate(selected, text)
+    }
 
     return (
         <div className="bg-[#0D1117] min-h-screen flex flex-col items-center justify-center py-20 px-4">
-            <h1 className="text-3xl md:text-4xl font-semibold text-[#D1D5DB] mb-12">
+            <h1 className="text-3xl md:text-4xl font-semibold text-[#D1D5DB] mb-12 text-center">
                 Choose Learning Method
             </h1>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
+            <div className="flex flex-wrap gap-8 justify-center mb-10">
                 {methods.map((m) => (
                 <Card
                     key={m.key}
@@ -50,7 +68,7 @@ export default function method() {
             </div>
 
             <Button
-                onClick={() => selected && router.push(`/process/${selected}`)}
+                onClick={handleContinue}
                 disabled={!selected}
                 className={`
                 bg-[#3B82F6] hover:bg-[#2563EB] text-[#0D1117]
@@ -58,8 +76,10 @@ export default function method() {
                 ${!selected ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
             >
-                Continue
+                {loading ? 'Generating…' : 'Continue'}
             </Button>
+
+            <Loading open={loading} progressText={`Generating ${selected}…`} />
         </div>
     )
 }
