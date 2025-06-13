@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { InferenceClient } from '@huggingface/inference'
+import JSON5 from 'json5'
 
 const HF_TOKEN = process.env.NEXT_PUBLIC_HF_TOKEN!
 const MODEL = 'mistralai/mistral-7b-instruct-v0.2'
@@ -18,29 +19,29 @@ export function useGenerateMethod() {
         setError(null)
         setOutput(null)
 
-        let systemMsg = ''
-        let formatInstruction = ''
-
+        let systemMsg   = ''
+        let formatInstr = ''
         if (method === 'summary') {
-            systemMsg = 'You are a top-tier summarizer. Produce a concise but information-dense summary.'
-            formatInstruction = 'Respond with valid JSON: { "summary": string }. Do NOT escape underscores with backslashes or include trailing commas.'
+            systemMsg   = 'You are a top-tier summarizer. Produce a concise but information-dense summary.'
+            formatInstr = 'You are a JSON-only response machine. Reply with strict JSON: `{ "summary": string }` (no comments, single quotes, or trailing commas) and NOTHING ELSE—not a single word of explanation.'
         } else if (method === 'quiz') {
-            systemMsg = 'You are an expert educator. Create up to 30 multiple-choice questions.'
-            formatInstruction = 'Respond with a JSON array of exactly 30 objects: [{ "question": string, "choices": [string], "answer": string }, …]. Do NOT escape underscores or include trailing commas.'
+            systemMsg   = 'You are an expert educator. Create 20 multiple-choice questions maximum you could do less if you think is enough.'
+            formatInstr = 'You are a JSON-only response machine. Reply with a strict JSON array of 20 objects: `[ { "question": string, "choices": [string], "answer": string }, … ]` (no comments, single quotes, or trailing commas) and NOTHING ELSE—not a single word of explanation.'
         } else {
-            systemMsg = 'You are a helpful tutor. Generate up to 30 flashcards.'
-            formatInstruction = 'Respond with a JSON array of exactly 30 objects: [{ "front": string, "back": string }, …]. Do NOT escape underscores or include trailing commas.'
+            systemMsg   = 'You are a helpful tutor. Generate 20 flashcards maximum you could do less if you think is enough.'
+            formatInstr = 'You are a JSON-only response machine. Reply with **one single** strict JSON array of 20 objects: `[ { "front": string, "back": string }, … ]` (no comments, single quotes, or trailing commas) and NOTHING ELSE—not a single word of explanation.'
         }
 
         const prompt = [
             systemMsg,
-            formatInstruction,
-            'Here is the text:',
+            formatInstr,
+            '=== TEXT ===',
             text,
+            '=== END ===',
         ].join('\n\n')
 
         try {
-            const result = await client.chatCompletion({
+            const res = await client.chatCompletion({
                 model: MODEL,
                 messages: [
                     { role: 'system', content: systemMsg },
@@ -48,27 +49,44 @@ export function useGenerateMethod() {
                 ],
                 parameters: {
                     max_new_tokens: 1500,
-                    temperature: 0.7,
-                    top_p: 0.9,
+                    temperature: 0.0,
+                    top_p: 0.1,
                 },
             })
 
-            const raw = result.choices?.[0]?.message?.content?.trim() || ''
+            const raw = res.choices?.[0]?.message?.content?.trim() || ''
             console.log('Raw HF reply:', raw)
 
-            const m = raw.match(/(\{[\s\S]*\})|(\[[\s\S]*\])/)?.[0]
-            if (!m) throw new Error('No JSON found in model response')
-            let jsonText = m
+            let jsonText: string
+            const startArr = raw.indexOf('[')
+            const endArr   = raw.lastIndexOf(']')
+            if (startArr !== -1 && endArr > startArr) {
+                jsonText = raw.slice(startArr, endArr + 1)
+            } else {
+                const startObj = raw.indexOf('{')
+                const endObj   = raw.lastIndexOf('}')
+                if (startObj !== -1 && endObj > startObj) {
+                jsonText = raw.slice(startObj, endObj + 1)
+                } else {
+                throw new Error('No JSON found in HF response')
+                }
+            }
 
-            jsonText = jsonText.replace(/\\_/g, '_')
-            jsonText = jsonText.replace(/,\s*([}\]])/g, '$1')
+            jsonText = jsonText
+                .replace(/\/\/.*$/gm, '')
+                .replace(/,\s*([\]}])/g, '$1')
 
             let parsed: any
             try {
                 parsed = JSON.parse(jsonText)
-            } catch (e: any) {
-                console.error('Failed to parse JSON:', e)
-                throw new Error('Invalid JSON returned from model')
+            } catch (e1) {
+                console.warn('JSON.parse failed, falling back to JSON5:', e1)
+                try {
+                parsed = JSON5.parse(jsonText)
+                } catch (e2) {
+                console.error('JSON5.parse also failed:', e2, '\nCleaned text:', jsonText)
+                throw new Error('Invalid JSON after cleaning')
+                }
             }
 
             setOutput(parsed)
