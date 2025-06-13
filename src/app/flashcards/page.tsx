@@ -5,19 +5,21 @@ import Menu from '@/components/Menu'
 import Footer from '@/components/footer'
 import { Button } from '@/components/ui/button'
 import { useSaveGenerated } from '@/hooks/useSaveGenerated'
+import * as Icons from '@heroicons/react/24/solid'
 
 type Card = { front: string; back: string }
 
 export default function FlashcardsPage() {
     const [cards, setCards] = useState<Card[]>([])
+    const [draftCards, setDraftCards] = useState<Card[]>([])
+    const [isEditing, setIsEditing] = useState(false)
     const [fileName, setFileName] = useState<string>('Flashcards')
     const { save, saving, error } = useSaveGenerated()
 
     useEffect(() => {
         const raw = sessionStorage.getItem('pdf_flashcards') || '[]'
         try {
-            const arr = JSON.parse(raw) as Card[]
-            setCards(arr.slice(0, 30))
+            setCards(JSON.parse(raw).slice(0, 30))
         } catch {
             setCards([])
         }
@@ -26,8 +28,35 @@ export default function FlashcardsPage() {
         if (name) setFileName(name)
     }, [])
 
+    useEffect(() => {
+        if (isEditing) {
+            sessionStorage.setItem('pdf_flashcards', JSON.stringify(draftCards))
+        }
+    }, [draftCards, isEditing])
+
+    const handleEdit = () => {
+        setDraftCards(cards.map(c => ({ ...c })))
+        setIsEditing(true)
+    }
+
+    const handleClose = async () => {
+        setCards(draftCards)
+        setIsEditing(false)
+    }
+
     const handleStartFlashcards = () => {
         save('flashcards', cards)
+    }
+
+    const updateFront = (idx: number, front: string) => {
+        const arr = [...draftCards]
+        arr[idx].front = front
+        setDraftCards(arr)
+    }
+    const updateBack = (idx: number, back: string) => {
+        const arr = [...draftCards]
+        arr[idx].back = back
+        setDraftCards(arr)
     }
 
     return (
@@ -35,25 +64,77 @@ export default function FlashcardsPage() {
             <Menu />
 
             <div className="flex-1 p-8 text-[#D1D5DB] space-y-6">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl">{fileName}</h2>
-                    <Button 
-                        className="bg-[#2563EB]"
-                        onClick={handleStartFlashcards}
-                        disabled={saving}
-                    >
-                        {saving ? 'Saving...' : 'Start Flashcards'}
-                    </Button>
+                <div className="relative flex items-center mb-10">
+                    <h2 className="p-2 px-8 border border-[#D1D5DB] rounded-2xl">Flashcards</h2>
+                    <h2 className="absolute left-1/2 transform -translate-x-1/2 text-2xl text-center">
+                        {fileName}
+                    </h2>
+                    <div className="ml-auto flex items-center space-x-2">
+                        {!isEditing && (
+                            <>
+                                <Icons.PencilSquareIcon
+                                    className="w-6 h-6 cursor-pointer text-[#D1D5DB]"
+                                    onClick={handleEdit}
+                                />
+                                <Button
+                                    className="bg-[#3B82F6] text-[#0D1117]"
+                                    onClick={handleStartFlashcards}
+                                    disabled={saving}
+                                >
+                                    {saving ? 'Saving…' : 'Start FlashCards'}
+                                </Button>
+                            </>
+                        )}
+                        {isEditing && (
+                        <>
+                            <Icons.XMarkIcon
+                                className="w-6 h-6 cursor-pointer text-[#D1D5DB]"
+                                onClick={handleClose}
+                            />
+                        </>
+                        )}
+                    </div>
                 </div>
 
-                {cards.map((c, i) => (
-                    <div key={i} className="bg-[#D1D5DB] text-[#0F172A] rounded-xl p-6">
+                {(isEditing ? draftCards : cards).map((c, i) => (
+                <div
+                    key={i}
+                    className="bg-[#D1D5DB] text-[#0F172A] rounded-xl p-6 space-y-4"
+                >
+                    {isEditing ? (
+                    <>
+                        <div>
+                            <label className="block font-semibold text-sm mb-1">
+                                Front:
+                            </label>
+                            <input
+                                type="text"
+                                className="w-full bg-white p-2 rounded outline-0"
+                                value={c.front}
+                                onChange={e => updateFront(i, e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block font-semibold text-sm mb-1 outline-0">
+                                Back:
+                            </label>
+                            <textarea
+                                className="w-full bg-white p-2 rounded h-24"
+                                value={c.back}
+                                onChange={e => updateBack(i, e.target.value)}
+                            />
+                        </div>
+                    </>
+                    ) : (
+                    <>
                         <p className="font-semibold mb-2">{c.front}</p>
                         <details className="mt-2 text-sm text-gray-700">
                         <summary>Show Answer</summary>
                         <p className="mt-1">{c.back}</p>
                         </details>
-                    </div>
+                    </>
+                    )}
+                </div>
                 ))}
             </div>
 
