@@ -29,13 +29,15 @@ export function useDocumentUpload() {
             const { data: doc, error: docErr } = await supabase
                 .from('documents')
                 .insert({
-                user_id: user.id,
-                name: file.name,
-                storage_key: path,
+                    user_id: user.id,
+                    name: file.name,
+                    storage_key: path,
                 })
                 .select('id')
                 .single()
             if (docErr || !doc) throw docErr || new Error('Document insert failed')
+
+            sessionStorage.setItem('pdf_docId', String(doc.id))
 
             const CHUNK_SIZE = 1000
             const chunks = []

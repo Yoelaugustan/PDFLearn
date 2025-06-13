@@ -21,6 +21,7 @@ export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
     if (done && scanFile) {
       sessionStorage.setItem('pdfText', text)
       uploadDocument(scanFile, text)
+      sessionStorage.setItem('pdfName', scanFile.name)
     }
   }, [done, scanFile, onContinue, text])
 
