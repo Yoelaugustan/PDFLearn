@@ -5,10 +5,13 @@ export default function Card({
   Icon,
   title,
   description,
+  selected = false,
+  onClick,
 }: CardProps) {
   return (
     <div
-      className="
+      onClick={onClick}
+      className={`
         bg-[#D1D5DB]
         rounded-xl
         w-full max-w-xs sm:w-64 md:w-72 lg:w-60
@@ -19,7 +22,10 @@ export default function Card({
         hover:scale-105
         transition-transform
         mx-auto
-      "
+        ${selected 
+          ? 'ring-3 ring-[#3B82F6]'
+          : ''}
+      `}
     >
       <Icon className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 text-[#0F172A] mt-1 sm:mt-2 mb-3 sm:mb-4" />
 
