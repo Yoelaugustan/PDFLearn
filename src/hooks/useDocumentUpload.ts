@@ -19,7 +19,11 @@ export function useDocumentUpload() {
             const { data: { user }, error: userErr } = await supabase.auth.getUser()
             if (userErr || !user) throw new Error('User not authenticated')
 
-            const path = `${user.id}/${Date.now()}_${file.name}`
+            const safeFileName = file.name
+                .normalize('NFKD')
+                .replace(/[^\w.\-]/g, '_') 
+
+            const path = `${user.id}/${Date.now()}_${safeFileName}`
             const { error: uploadErr } = await supabase
                 .storage
                 .from('pdfs')
