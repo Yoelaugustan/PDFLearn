@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import * as Icons from "@heroicons/react/24/solid";
 import { useAuthenticationActions } from '@/hooks/useAuthenticationActions';
+import { useRouter } from 'next/navigation';
 
 export default function menu() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { signOut } = useAuthenticationActions();
+  const router = useRouter()
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -14,10 +16,14 @@ export default function menu() {
     setIsDropdownOpen(false);
     signOut();
   };
+
+  const goToLanding = () => {
+    router.replace("/landing")
+  }
   
   return (
     <div className='bg-[#0D1117] p-5 shadow border-b-1 border-[#6B7280] justify-between flex'>
-      <div className="flex items-center gap-2 cursor-pointer">
+      <div className="flex items-center gap-2 cursor-pointer" onClick={goToLanding}>
         <Icons.DocumentTextIcon className="h-7 w-7 text-[#D1D5DB]"/>
         <h1 className="text-xl font-bold text-[#D1D5DB]">PDFLearn</h1>
       </div>

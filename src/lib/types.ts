@@ -13,3 +13,14 @@ export type DropzoneProps = {
     onFileSelected?: (file: File) => void
     onContinue?: (file: File, text: string) => void
 }
+
+export type Q = { 
+    question: string
+    choices: string[] 
+    answer: string 
+}
+
+export type Card = { 
+    front: string
+    back: string 
+}
