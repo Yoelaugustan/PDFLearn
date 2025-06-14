@@ -1,4 +1,3 @@
-// app/flashcards/page.tsx
 'use client'
 import React, { useEffect, useState } from 'react'
 import Menu from '@/components/Menu'
@@ -6,8 +5,8 @@ import Footer from '@/components/footer'
 import { Button } from '@/components/ui/button'
 import { useSaveGenerated } from '@/hooks/useSaveGenerated'
 import * as Icons from '@heroicons/react/24/solid'
-
-type Card = { front: string; back: string }
+import { useRouter } from 'next/navigation'
+import { Card } from '@/lib/types'
 
 export default function FlashcardsPage() {
     const [cards, setCards] = useState<Card[]>([])
@@ -15,6 +14,7 @@ export default function FlashcardsPage() {
     const [isEditing, setIsEditing] = useState(false)
     const [fileName, setFileName] = useState<string>('Flashcards')
     const { save, saving, error } = useSaveGenerated()
+    const router = useRouter()
 
     useEffect(() => {
         const raw = sessionStorage.getItem('pdf_flashcards') || '[]'
@@ -46,6 +46,7 @@ export default function FlashcardsPage() {
 
     const handleStartFlashcards = () => {
         save('flashcards', cards)
+        router.push('/flashcards/start')
     }
 
     const updateFront = (idx: number, front: string) => {
@@ -64,12 +65,12 @@ export default function FlashcardsPage() {
             <Menu />
 
             <div className="flex-1 p-8 text-[#D1D5DB] space-y-6">
-                <div className="relative flex items-center mb-10">
-                    <h2 className="p-2 px-8 border border-[#D1D5DB] rounded-2xl">Flashcards</h2>
-                    <h2 className="absolute left-1/2 transform -translate-x-1/2 text-2xl text-center">
+                <div className="relative flex flex-col md:flex-row items-center mb-10">
+                    <h2 className="p-2 px-8 border border-[#D1D5DB] rounded-2xl mb-4 md:mb-0">Flashcards</h2>
+                    <h2 className="text-2xl text-center md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
                         {fileName}
                     </h2>
-                    <div className="ml-auto flex items-center space-x-2">
+                    <div className="mt-4 md:mt-0 md:ml-auto flex space-x-2 items-center">
                         {!isEditing && (
                             <>
                                 <Icons.PencilSquareIcon

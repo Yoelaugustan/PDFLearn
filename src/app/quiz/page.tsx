@@ -1,4 +1,3 @@
-// app/quiz/page.tsx
 'use client'
 import React, { useEffect, useState } from 'react'
 import Menu from '@/components/Menu'
@@ -6,8 +5,8 @@ import Footer from '@/components/footer'
 import { Button } from '@/components/ui/button'
 import { useSaveGenerated } from '@/hooks/useSaveGenerated'
 import * as Icons from '@heroicons/react/24/solid'
-
-type Q = { question: string; choices: string[]; answer: string }
+import { Q } from '@/lib/types'
+import { useRouter } from 'next/navigation'
 
 export default function QuizPage() {
     const [qs, setQs] = useState<Q[]>([])
@@ -15,6 +14,7 @@ export default function QuizPage() {
     const [isEditing, setIsEditing] = useState(false)
     const [fileName, setFileName] = useState<string>('Quiz')
     const { save, saving, error } = useSaveGenerated()
+    const router = useRouter()
 
     useEffect(() => {
         const raw = sessionStorage.getItem('pdf_quiz') || '[]'
@@ -44,6 +44,7 @@ export default function QuizPage() {
 
     const handleStartQuiz = () => {
         save('quiz', qs)
+        router.push("/quiz/start")
     }
 
     const updateQuestion = (idx: number, question: string) => {
@@ -79,13 +80,12 @@ export default function QuizPage() {
         <Menu />
 
         <div className="flex-1 p-8 text-[#D1D5DB] space-y-6">
-            {/* header */}
-            <div className="relative flex items-center mb-10">
-                <h2 className='p-2 px-8 border border-[#D1D5DB] rounded-2xl'>Quiz</h2>
-                <h2 className="absolute left-1/2 transform -translate-x-1/2 text-2xl text-center">
+            <div className="relative flex flex-col md:flex-row items-center mb-10">
+                <h2 className='p-2 px-8 border border-[#D1D5DB] rounded-2xl mb-4 md:mb-0'>Quiz</h2>
+                <h2 className="text-2xl text-center md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
                     {fileName}
                 </h2>
-                <div className="ml-auto flex space-x-2 items-center">
+                <div className="mt-4 md:mt-0 md:ml-auto flex space-x-2 items-center">
                     {!isEditing && (
                         <>
                             <Icons.PencilSquareIcon
@@ -147,7 +147,7 @@ export default function QuizPage() {
                         Correct Answer:
                     </label>
                     <select
-                        className="bg-white p-2 rounded outline-0"
+                        className="w-full bg-white p-2 rounded outline-0 truncate overflow-hidden whitespace-nowrap"
                         value={q.answer}
                         onChange={e => updateAnswer(i, e.target.value)}
                     >
