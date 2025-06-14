@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
+import { cleanTextForPostgres } from '@/utils/cleanText'    
 
 export function useDocumentUpload() {
     const router = useRouter()
@@ -43,13 +44,19 @@ export function useDocumentUpload() {
 
             sessionStorage.setItem('pdf_docId', String(doc.id))
 
+            const safe = cleanTextForPostgres(text)
+
             const CHUNK_SIZE = 1000
-            const chunks = []
-            for (let i = 0; i < text.length; i += CHUNK_SIZE) {
+            const chunks: {
+                document_id: string
+                chunk_index: number
+                text: string
+            }[] = []
+            for (let i = 0; i < safe.length; i += CHUNK_SIZE) {
                 chunks.push({
-                document_id: doc.id,
-                chunk_index: Math.floor(i / CHUNK_SIZE),
-                text: text.slice(i, i + CHUNK_SIZE),
+                    document_id: doc.id,
+                    chunk_index: Math.floor(i / CHUNK_SIZE),
+                    text: safe.slice(i, i + CHUNK_SIZE),
                 })
             }
             const { error: chunkErr } = await supabase
