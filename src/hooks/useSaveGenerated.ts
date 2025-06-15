@@ -2,8 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
-
-export type Method = 'summary' | 'quiz' | 'flashcards'
+import { HistoryEntry, Method } from '@/lib/types'
 
 export function useSaveGenerated() {
     const supabase = createClient()
@@ -16,6 +15,13 @@ export function useSaveGenerated() {
         setError(null)
 
         try {
+            const {
+                data: { user },
+                error: authErr
+            } = await supabase.auth.getUser()
+            if (authErr || !user) throw authErr || new Error('Not authenticated')
+            const user_id = user.id
+
             const docIdRaw = sessionStorage.getItem('pdf_docId')
             if (!docIdRaw) throw new Error('Missing document ID')
             const document_id = docIdRaw
@@ -52,8 +58,13 @@ export function useSaveGenerated() {
                 throw new Error(`Unknown method “${method}”`)
             }
 
-            const { error: insertError } = await supabase.from(table).insert(row)
+            const { error: insertError } = await supabase.from(table).upsert(row)
             if (insertError) throw insertError
+
+            const { error: histErr } = await supabase
+                .from('history')
+                .insert({ user_id, document_id, method })
+            if (histErr) throw histErr
 
             return true
         } catch (e: any) {

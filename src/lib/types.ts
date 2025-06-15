@@ -24,3 +24,11 @@ export type Card = {
     front: string
     back: string 
 }
+
+export type Method = 'summary' | 'quiz' | 'flashcards'
+
+export interface HistoryEntry {
+    document_id: string
+    name:string
+    method: Method
+}
