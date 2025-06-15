@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📚 PDFLearn
 
-## Getting Started
+PDFLearn is a web app that helps users learn faster from their documents. Simply upload a PDF, and let the AI generate:
+- ✅ A concise **summary**
+- 🧠 Study-ready **flashcards**
+- ❓ An interactive **quiz**
 
-First, run the development server:
+Built with Next.js, Supabase, and Hugging Face’s Mistral-7B, PDFLearn is ideal for students, researchers, and professionals who want to save time and boost understanding.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- 📤 Upload PDF files (max 20 MB)
+- 📑 Extracts and analyzes document content
+- 🧠 AI-powered summarization, quiz, and flashcard generation
+- 📲 Interactive quiz with scoring
+- 🔐 User authentication and storage (via Supabase)
+- 🎨 Responsive design using Tailwind CSS
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🧰 Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+| Layer            | Tool / Service                                   |
+|------------------|--------------------------------------------------|
+| Frontend         | Next.js (React), Tailwind CSS                    |
+| File Storage     | Supabase Storage                                 |
+| Backend          | Next.js API Routes                               |
+| Database         | Supabase PostgreSQL (via Prisma)                 |
+| LLM Generation   | Hugging Face Inference API (Mistral-7B-Instruct) |
+| OCR Support      | Tesseract.js (for scanned PDFs)                  |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Visit The Web
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
