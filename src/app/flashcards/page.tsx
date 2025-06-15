@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import Menu from '@/components/Menu'
 import Footer from '@/components/footer'
 import { Button } from '@/components/ui/button'
-import { useSaveGenerated } from '@/hooks/useSaveGenerated'
 import * as Icons from '@heroicons/react/24/solid'
 import { useRouter } from 'next/navigation'
 import { Card } from '@/lib/types'
@@ -18,9 +17,15 @@ export default function FlashcardsPage() {
 
     useEffect(() => {
         if (Array.isArray(data?.cards)) {
-            const slice = data.cards.slice(0, 30)
+            const slice = (data.cards as Card[]).slice(0, 30)
+
             setCards(slice)
-            setDraftCards(slice.map(c => ({ ...c })))
+
+            setDraftCards(
+                slice.map((c: Card) => ({
+                    ...c,
+                }))
+            )
         }
     }, [data])
 
@@ -81,7 +86,7 @@ export default function FlashcardsPage() {
                         <>
                             <Icons.XMarkIcon
                                 className="w-6 h-6 cursor-pointer text-[#D1D5DB]"
-                                onClick={() => setIsEditing(false)}
+                                onClick={() => {setIsEditing(false); setCards(draftCards)}}
                             />
                         </>
                         )}

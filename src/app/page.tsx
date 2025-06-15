@@ -1,5 +1,3 @@
-import Image from "next/image";
-import Menu from "@/components/Menu";
 import Login from "./auth/login/page";
 
 export default function Home() {

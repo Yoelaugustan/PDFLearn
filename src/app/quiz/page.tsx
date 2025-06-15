@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import Menu from '@/components/Menu'
 import Footer from '@/components/footer'
 import { Button } from '@/components/ui/button'
-import { useSaveGenerated } from '@/hooks/useSaveGenerated'
 import * as Icons from '@heroicons/react/24/solid'
 import { Q } from '@/lib/types'
 import { useRouter } from 'next/navigation'
@@ -18,10 +17,15 @@ export default function QuizPage() {
 
     useEffect(() => {
         if (Array.isArray(data?.questions)) {
-            const slice = data.questions.slice(0, 30)
+            const slice = (data.questions as Q[]).slice(0, 30)
+
             setQs(slice)
-        
-            setDraft(slice.map(q => ({ ...q, choices: [...q.choices] })))
+            setDraft(
+                slice.map((q: Q) => ({
+                    ...q,
+                    choices: [...q.choices],
+                }))
+            )
         }
     }, [data])
 
@@ -39,7 +43,8 @@ export default function QuizPage() {
         router.push('/quiz/start')
     }
     const updateQuestion = (i: number, t: string) => {
-        const c = [...draft]; c[i].question = t; setDraft(c)
+        const c = [...draft]; c[i].question = t
+        setDraft(c)
     }
     const updateChoice = (qi: number, ci: number, txt: string) => {
         const c = draft.map((q, i) => {
@@ -51,7 +56,8 @@ export default function QuizPage() {
         setDraft(c)
     }
     const updateAnswer = (i: number, ans: string) => {
-        const c = [...draft]; c[i].answer = ans; setDraft(c)
+        const c = [...draft]; c[i].answer = ans
+        setDraft(c)
     }
     
     if (loading) return <div className="p-8 text-white">Loading…</div>
@@ -86,7 +92,7 @@ export default function QuizPage() {
                         <>
                             <Icons.XMarkIcon
                                 className="w-6 h-6 cursor-pointer text-[#D1D5DB]"
-                                onClick={() => setEditing(false)}
+                                onClick={() => {setEditing(false); setQs(draft)}}
                             />
                         </>
                     )}
@@ -100,66 +106,66 @@ export default function QuizPage() {
             </p>
 
             {(editing ? draft : qs).map((q, i) => (
-            <div key={i} className="bg-[#D1D5DB] text-[#0F172A] rounded-xl p-6 space-y-4">
-                {editing ? (
-                <>
-                    <div>
-                    <label className="block font-semibold text-sm mb-1">
-                        Q{i+1}:
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full bg-white p-2 rounded outline-0"
-                        value={q.question}
-                        onChange={e => updateQuestion(i, e.target.value)}
-                    />
-                    </div>
-
-                    <div className="space-y-2">
-                    {q.choices.map((c, j) => (
-                        <div key={j} className="flex items-center space-x-2">
-                        <span className="font-medium">{String.fromCharCode(65+j)}.</span>
+                <div key={i} className="bg-[#D1D5DB] text-[#0F172A] rounded-xl p-6 space-y-4">
+                    {editing ? (
+                    <>
+                        <div>
+                        <label className="block font-semibold text-sm mb-1">
+                            Q{i+1}:
+                        </label>
                         <input
                             type="text"
-                            className="flex-1 bg-white p-1 rounded outline-0"
-                            value={c}
-                            onChange={e => updateChoice(i, j, e.target.value)}
+                            className="w-full bg-white p-2 rounded outline-0"
+                            value={q.question}
+                            onChange={e => updateQuestion(i, e.target.value)}
                         />
                         </div>
-                    ))}
-                    </div>
 
-                    <div>
-                    <label className="block font-semibold text-sm mb-1">
-                        Correct Answer:
-                    </label>
-                    <select
-                        className="w-full bg-white p-2 rounded outline-0 truncate overflow-hidden whitespace-nowrap"
-                        value={q.answer}
-                        onChange={e => updateAnswer(i, e.target.value)}
-                    >
-                        {q.choices.map((c,j) => (
-                        <option key={j} value={c}>
-                            {String.fromCharCode(65+j)}. {c}
-                        </option>
-                        ))}
-                    </select>
-                    </div>
-                </>
-                ) : (
-                <>
-                    <h3 className="font-semibold mb-2">
-                        Q{i + 1}: {q.question}
-                    </h3>
-                    <ul className="list-disc list-inside mb-2">
+                        <div className="space-y-2">
                         {q.choices.map((c, j) => (
-                            <li key={j}>{c}</li>
+                            <div key={j} className="flex items-center space-x-2">
+                            <span className="font-medium">{String.fromCharCode(65+j)}.</span>
+                            <input
+                                type="text"
+                                className="flex-1 bg-white p-1 rounded outline-0"
+                                value={c}
+                                onChange={e => updateChoice(i, j, e.target.value)}
+                            />
+                            </div>
                         ))}
-                    </ul>
-                    <p className="text-[#10B981]">Answer: {q.answer}</p>
-                </>
-                )}
-            </div>
+                        </div>
+
+                        <div>
+                        <label className="block font-semibold text-sm mb-1">
+                            Correct Answer:
+                        </label>
+                        <select
+                            className="w-full bg-white p-2 rounded outline-0 truncate overflow-hidden whitespace-nowrap"
+                            value={q.answer}
+                            onChange={e => updateAnswer(i, e.target.value)}
+                        >
+                            {q.choices.map((c,j) => (
+                            <option key={j} value={c}>
+                                {String.fromCharCode(65+j)}. {c}
+                            </option>
+                            ))}
+                        </select>
+                        </div>
+                    </>
+                    ) : (
+                    <>
+                        <h3 className="font-semibold mb-2">
+                            Q{i + 1}: {q.question}
+                        </h3>
+                        <ul className="list-disc list-inside mb-2">
+                            {q.choices.map((c, j) => (
+                                <li key={j}>{c}</li>
+                            ))}
+                        </ul>
+                        <p className="text-[#10B981]">Answer: {q.answer}</p>
+                    </>
+                    )}
+                </div>
             ))}
         </div>
 

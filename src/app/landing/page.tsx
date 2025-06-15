@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React from 'react'
 import Menu from '@/components/Menu'
 import Dropzone from '@/components/Dropzone'
 import Card from '@/components/card'
