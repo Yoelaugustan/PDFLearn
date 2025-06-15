@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import type { Q, Card, HistoryEntry, Method } from '@/lib/types'
+import type { HistoryEntry, Method } from '@/lib/types'
 
 const supabase = createClient()
 

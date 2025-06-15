@@ -1,9 +1,6 @@
 'use client'
-
 import React, { useState } from 'react'
-import Menu from '../../../components/Menu'
 import * as Icons from "@heroicons/react/24/solid";
-import { Icon } from 'lucide-react';
 import { Google } from '@/themes/icons';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

@@ -1,8 +1,7 @@
 'use client'
-
 import { useState, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { HistoryEntry, Method } from '@/lib/types'
+import { Method } from '@/lib/types'
 
 export function useSaveGenerated() {
     const supabase = createClient()

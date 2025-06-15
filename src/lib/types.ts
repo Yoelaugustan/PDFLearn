@@ -1,4 +1,3 @@
-import React from 'react'
 import { ComponentType } from 'react'
 
 export type CardProps = {
@@ -28,6 +27,7 @@ export type Card = {
 export type Method = 'summary' | 'quiz' | 'flashcards'
 
 export interface HistoryEntry {
+    id: string
     document_id: string
     name:string
     method: Method
