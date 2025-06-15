@@ -20,6 +20,9 @@ export default function menu() {
   const goToLanding = () => {
     router.replace("/landing")
   }
+  const goToHisotry = () => {
+    router.replace("/history")
+  }
   
   return (
     <div className='bg-[#0D1117] p-5 shadow border-b-1 border-[#6B7280] justify-between flex'>
@@ -29,7 +32,7 @@ export default function menu() {
       </div>
 
       <div className='flex gap-6'>
-        <h1 className="text-xl font-bold text-[#D1D5DB] cursor-pointer">History</h1>
+        <h1 className="text-xl font-bold text-[#D1D5DB] cursor-pointer" onClick={goToHisotry}>History</h1>
         
         <div className="relative">
           <div onClick={toggleDropdown} className="cursor-pointer">
