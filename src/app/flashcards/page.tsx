@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Menu from '@/components/Menu'
 import Footer from '@/components/footer'
 import { Button } from '@/components/ui/button'
@@ -7,45 +7,34 @@ import { useSaveGenerated } from '@/hooks/useSaveGenerated'
 import * as Icons from '@heroicons/react/24/solid'
 import { useRouter } from 'next/navigation'
 import { Card } from '@/lib/types'
+import { useGenerated } from '@/hooks/useFetchGenerated'
 
 export default function FlashcardsPage() {
+    const { data, fileName, loading, error, update } = useGenerated('flashcards')
     const [cards, setCards] = useState<Card[]>([])
     const [draftCards, setDraftCards] = useState<Card[]>([])
     const [isEditing, setIsEditing] = useState(false)
-    const [fileName, setFileName] = useState<string>('Flashcards')
-    const { save, saving, error } = useSaveGenerated()
     const router = useRouter()
 
     useEffect(() => {
-        const raw = sessionStorage.getItem('pdf_flashcards') || '[]'
-        try {
-            setCards(JSON.parse(raw).slice(0, 30))
-        } catch {
-            setCards([])
+        if (Array.isArray(data?.cards)) {
+            const slice = data.cards.slice(0, 30)
+            setCards(slice)
+            setDraftCards(slice.map(c => ({ ...c })))
         }
+    }, [data])
 
-        const name = sessionStorage.getItem('pdfName')
-        if (name) setFileName(name)
-    }, [])
+    const isUnchanged = useMemo(() => {
+        return JSON.stringify(cards) === JSON.stringify(draftCards)
+    }, [cards, draftCards])
 
-    useEffect(() => {
-        if (isEditing) {
-            sessionStorage.setItem('pdf_flashcards', JSON.stringify(draftCards))
+    const handleUpdate = async () => {
+        if (isEditing) return
+        const ok = await update(draftCards)
+        if (ok) {
+            setCards(draftCards)
+            setIsEditing(false)
         }
-    }, [draftCards, isEditing])
-
-    const handleEdit = () => {
-        setDraftCards(cards.map(c => ({ ...c })))
-        setIsEditing(true)
-    }
-
-    const handleClose = async () => {
-        setCards(draftCards)
-        setIsEditing(false)
-    }
-
-    const handleStartFlashcards = () => {
-        save('flashcards', cards)
         router.push('/flashcards/start')
     }
 
@@ -59,6 +48,8 @@ export default function FlashcardsPage() {
         arr[idx].back = back
         setDraftCards(arr)
     }
+
+    if (loading) return <div className="p-8 text-white">Loading…</div>
 
     return (
         <div className="bg-[#0D1117] min-h-screen flex flex-col">
@@ -75,14 +66,14 @@ export default function FlashcardsPage() {
                             <>
                                 <Icons.PencilSquareIcon
                                     className="w-6 h-6 cursor-pointer text-[#D1D5DB]"
-                                    onClick={handleEdit}
+                                    onClick={() => setIsEditing(true)}
                                 />
                                 <Button
                                     className="bg-[#3B82F6] text-[#0D1117]"
-                                    onClick={handleStartFlashcards}
-                                    disabled={saving}
+                                    onClick={handleUpdate}
+                                    disabled={isEditing}
                                 >
-                                    {saving ? 'Saving…' : 'Start FlashCards'}
+                                    { isEditing ? isUnchanged ? 'No changes' : 'Update' : 'Start Flashcards' }
                                 </Button>
                             </>
                         )}
@@ -90,7 +81,7 @@ export default function FlashcardsPage() {
                         <>
                             <Icons.XMarkIcon
                                 className="w-6 h-6 cursor-pointer text-[#D1D5DB]"
-                                onClick={handleClose}
+                                onClick={() => setIsEditing(false)}
                             />
                         </>
                         )}
