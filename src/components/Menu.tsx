@@ -3,7 +3,7 @@ import * as Icons from "@heroicons/react/24/solid";
 import { useAuthenticationActions } from '@/hooks/useAuthenticationActions';
 import { useRouter } from 'next/navigation';
 
-export default function menu() {
+export default function Menu() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { signOut } = useAuthenticationActions();
   const router = useRouter()

@@ -31,7 +31,7 @@ const methods = [
 
 type MethodKey = (typeof methods)[number]['key']
 
-export default function method() {
+export default function MethodPage() {
     const [selected, setSelected] = useState<MethodKey | null>(null)
     const router = useRouter()
     const { generate, loading, output, error } = useGenerateMethod()

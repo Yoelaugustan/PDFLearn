@@ -9,7 +9,7 @@ import { useAuthenticationActions } from '@/hooks/useAuthenticationActions';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 
-export default function login() {
+export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
