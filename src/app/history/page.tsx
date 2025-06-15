@@ -35,8 +35,10 @@ export default function HistoryPage() {
                         <li key={h.id} className="flex items-center bg-[#D1D5DB] rounded-xl p-4">
                         <span className="w-6 text-right mr-4 text-[#0F172A]">{i + 1}.</span>
                         <div className="flex-1 flex items-center justify-between text-[#0F172A]">
-                            <span className="font-semibold">{h.name}</span>
-                            <span>Type: <strong>{h.method}</strong></span>
+                            <div className='flex gap-5'>
+                                <span className="font-semibold">{h.name}</span>
+                                <span>Type: <strong>{h.method}</strong></span>
+                            </div>
                             <Button
                                 className="bg-[#3B82F6] px-4"
                                 onClick={() => handleLearnAgain(h.method, h)}
