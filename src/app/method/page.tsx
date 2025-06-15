@@ -6,6 +6,7 @@ import * as Icons from '@heroicons/react/24/solid'
 import { Button } from '@/components/ui/button'
 import { useGenerateMethod } from '@/hooks/useGenerateMethod'
 import Loading from '@/components/Loading'
+import { useSaveGenerated } from '@/hooks/useSaveGenerated'
 
 const methods = [
     { 
@@ -34,13 +35,18 @@ export default function method() {
     const [selected, setSelected] = useState<MethodKey | null>(null)
     const router = useRouter()
     const { generate, loading, output, error } = useGenerateMethod()
+    const { save, saving: savingToDb } = useSaveGenerated()
 
     useEffect(() => {
-        if (!loading && output) {
+        if (!loading && output && selected) {
             sessionStorage.setItem(`pdf_${selected}`, JSON.stringify(output))
-            router.push(`/${selected}`)
+            save(selected, output).then((ok) => {
+                if (ok) {
+                    router.push(`/${selected}`)
+                }
+            })
         }
-    }, [loading, output, selected, router])
+    }, [loading, output, selected, save, router])
 
     const handleContinue = () => {
         const text = sessionStorage.getItem('pdfText')
@@ -69,17 +75,17 @@ export default function method() {
 
             <Button
                 onClick={handleContinue}
-                disabled={!selected}
+                disabled={!selected || loading || savingToDb}
                 className={`
-                bg-[#3B82F6] hover:bg-[#2563EB] text-[#0D1117]
-                font-medium text-base py-4 px-8 rounded-xl
-                ${!selected ? 'opacity-50 cursor-not-allowed' : ''}
+                    bg-[#3B82F6] hover:bg-[#2563EB] text-[#0D1117]
+                    font-medium text-base py-4 px-8 rounded-xl
+                    ${!selected ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
             >
-                {loading ? 'Generating…' : 'Continue'}
+                {loading|| savingToDb ? 'Generating…' : 'Continue'}
             </Button>
 
-            <Loading open={loading} progressText={`Generating ${selected}…`} />
+            <Loading open={loading || savingToDb} progressText={savingToDb ? `Saving ${selected}…` : `Generating ${selected}…`} />
         </div>
     )
 }
