@@ -5,14 +5,15 @@ import Menu from '@/components/Menu'
 import Footer from '@/components/footer'
 import { Button } from '@/components/ui/button'
 import { useFetchHistory } from '@/hooks/useFetchGenerated'
+import { HistoryEntry } from '@/lib/types'
 
 export default function HistoryPage() {
-    const { history, loading, error } = useFetchHistory()
+    const { history, loading } = useFetchHistory()
     const router = useRouter()
 
     if (loading) return <div className="p-8 text-white">Loading history…</div>
 
-    const handleLearnAgain = (method: string, h: any) => {
+    const handleLearnAgain = (method: string, h: HistoryEntry) => {
         sessionStorage.setItem('pdf_docId', h.document_id)
         router.push(`/${method}`)
     }

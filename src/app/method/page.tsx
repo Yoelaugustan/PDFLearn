@@ -34,7 +34,7 @@ type MethodKey = (typeof methods)[number]['key']
 export default function MethodPage() {
     const [selected, setSelected] = useState<MethodKey | null>(null)
     const router = useRouter()
-    const { generate, loading, output, error } = useGenerateMethod()
+    const { generate, loading, output } = useGenerateMethod()
     const { save, saving: savingToDb } = useSaveGenerated()
 
     useEffect(() => {

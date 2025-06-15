@@ -93,7 +93,7 @@ export default function LoginPage() {
                 <h1 className='text-3xl font-semibold text-center text-[#D1D5DB] mb-2'>Welcome back</h1>
                 
                 <div className='text-center mb-6 flex gap-1 justify-center'>
-                    <p className='text-[#6B7280]'>Don't Have An Account?</p>
+                    <p className='text-[#6B7280]'>Don&apos;t Have An Account?</p>
                     <p className='text-[#10FFCB] cursor-pointer'>
                         <Link href="/auth/signup">Sign Up</Link>
                     </p>

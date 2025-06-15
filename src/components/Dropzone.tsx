@@ -5,16 +5,15 @@ import * as Icons from '@heroicons/react/24/solid'
 import { DropzoneProps } from '@/lib/types';
 import { Button } from './ui/button';
 import { usePdfScanner } from '@/hooks/usePDFScanner';
-import { useRouter } from 'next/navigation';
 import { useDocumentUpload } from '@/hooks/useDocumentUpload'
+import Image from 'next/image';
 
 export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
   const [file, setFile] = useState<File | null>(null)
   const [scanFile, setScanFile] = useState<File | null>(null)
-  const router = useRouter()
 
   const { progress, text, done, error } = usePdfScanner(scanFile)
-  const { uploadDocument, uploading, error: uploadError } = useDocumentUpload()
+  const { uploadDocument } = useDocumentUpload()
 
 
   useEffect(() => {
@@ -23,7 +22,7 @@ export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
       uploadDocument(scanFile, text)
       sessionStorage.setItem('pdfName', scanFile.name)
     }
-  }, [done, scanFile, onContinue, text])
+  }, [done, scanFile, onContinue, text, uploadDocument])
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -72,7 +71,7 @@ export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
                 <li>Max file size 20 MB</li>
               </ul>
               <p className="text-[#6B7280] text-[9px] sm:text-[10px] text-center px-2 sm:px-4 leading-tight">
-                *If your PDF has images, we'll try to read or describe them using AI.
+                *If your PDF has images, we&apos;ll try to read or describe them using AI.
                 For best results, please upload text-only PDFs.*
               </p>
             </div>
@@ -114,7 +113,7 @@ export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
 
       {scanFile && !done && (
         <div className="fixed inset-0 bg-black/50 z-50 flex flex-col items-center justify-center p-4">
-          <img src='/Scanning.gif' alt="Scanning…" className="w-24 h-24 mb-6" />
+          <Image src='/Scanning.gif' alt="Scanning…" className="w-24 h-24 mb-6" />
           <div className="w-full max-w-md bg-gray-700 rounded-full h-2 overflow-hidden mb-2">
             <div
               className="h-full bg-green-500 transition-all"

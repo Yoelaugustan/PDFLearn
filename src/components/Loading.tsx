@@ -1,13 +1,13 @@
-// components/LoadingModal.tsx
 'use client'
 import React from 'react'
+import Image from 'next/image'
 
 export default function LoadingModal({ open, progressText }: { open: boolean, progressText?: string }) {
     if (!open) return null
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
             <div className="bg-black rounded-2xl p-6 flex flex-col items-center">
-                <img src="/Loading.gif" alt="Loading…" className="w-[50%] h-[50%] mb-4" />
+                <Image src="/Loading.gif" alt="Loading…" className="w-[50%] h-[50%] mb-4"/>
                 <h1 className="text-white">{progressText}</h1>
             </div>
         </div>

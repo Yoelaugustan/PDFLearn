@@ -65,9 +65,12 @@ export function useDocumentUpload() {
             if (chunkErr) throw chunkErr
 
             router.push('/method')
-        } catch (err: any) {
-            console.error('Document upload failed', err)
-            setError(err.message || 'Upload failed')
+        } catch (err: unknown) {
+            const message =
+                err instanceof Error ? err.message : 'Upload failed';
+
+            console.error('Document upload failed', err);
+            setError(message);
         } finally {
             setUploading(false)
         }

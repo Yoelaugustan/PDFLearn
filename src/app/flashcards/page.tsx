@@ -9,7 +9,7 @@ import { Card } from '@/lib/types'
 import { useGenerated } from '@/hooks/useFetchGenerated'
 
 export default function FlashcardsPage() {
-    const { data, fileName, loading, error, update } = useGenerated('flashcards')
+    const { data, fileName, loading, update } = useGenerated('flashcards')
     const [cards, setCards] = useState<Card[]>([])
     const [draftCards, setDraftCards] = useState<Card[]>([])
     const [isEditing, setIsEditing] = useState(false)

@@ -16,7 +16,7 @@ function getTableForMethod(method: Method) {
 
 export function useGenerated(method: Method) {
     const table = getTableForMethod(method)
-    const [data, setData] = useState<any>(null)
+    const [data, setData] = useState<Record<string, any> | null>(null)
     const [fileName, setFileName] = useState<string>('') 
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string|null>(null)
@@ -43,8 +43,9 @@ export function useGenerated(method: Method) {
             if (docErr) throw docErr
 
             setFileName(doc.name)
-        } catch (e: any) {
-            setError(e.message)
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : 'Unexpected error';
+            setError(message);
         } finally {
             setLoading(false)
         }
@@ -58,7 +59,7 @@ export function useGenerated(method: Method) {
             }
             setLoading(true)
             try {
-                let changes: any = {}
+                const changes: Record<string, any> = {}
                 if (method === 'summary') changes.summary_text = payload.summary ?? payload
                 if (method === 'quiz') changes.questions = payload
                 if (method === 'flashcards') changes.cards = payload

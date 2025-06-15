@@ -1,4 +1,3 @@
-import { ComponentType } from 'react'
 import { CardProps } from '@/lib/types'
 
 export default function Card({

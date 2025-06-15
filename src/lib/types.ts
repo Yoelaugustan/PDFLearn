@@ -32,3 +32,13 @@ export interface HistoryEntry {
     name:string
     method: Method
 }
+
+export type HistoryRow = {
+    id: string;
+    document_id: string;
+    method: Method;
+    created_at: string;
+    documents: {
+        name: string;
+    };
+}

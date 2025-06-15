@@ -90,7 +90,7 @@ export default function Landing() {
           </div>
 
           <p className="text-[#D1D5DB] max-w-2xl text-center text-sm md:text-base px-4">
-            Whether you're a student reviewing lecture notes or a professional going through reports,
+            Whether you&apos;re a student reviewing lecture notes or a professional going through reports,
             PDFLearn helps you save time and study smarter — no need to copy-paste or highlight manually,
             just drop your file and let the AI do the rest.
           </p>
