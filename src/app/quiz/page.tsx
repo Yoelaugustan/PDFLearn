@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Menu from '@/components/Menu'
 import Footer from '@/components/footer'
 import { Button } from '@/components/ui/button'
@@ -7,73 +7,54 @@ import { useSaveGenerated } from '@/hooks/useSaveGenerated'
 import * as Icons from '@heroicons/react/24/solid'
 import { Q } from '@/lib/types'
 import { useRouter } from 'next/navigation'
+import { useGenerated } from '@/hooks/useFetchGenerated'
 
 export default function QuizPage() {
+    const { data, fileName, loading, error, update } = useGenerated('quiz')
     const [qs, setQs] = useState<Q[]>([])
-    const [draftQs, setDraftQs] = useState<Q[]>([])
-    const [isEditing, setIsEditing] = useState(false)
-    const [fileName, setFileName] = useState<string>('Quiz')
-    const { save, saving, error } = useSaveGenerated()
+    const [draft, setDraft] = useState<Q[]>([])
+    const [editing, setEditing] = useState(false)
     const router = useRouter()
 
     useEffect(() => {
-        const raw = sessionStorage.getItem('pdf_quiz') || '[]'
-        try {
-            setQs(JSON.parse(raw).slice(0,30))
-        } catch {
-            setQs([])
+        if (Array.isArray(data?.questions)) {
+            const slice = data.questions.slice(0, 30)
+            setQs(slice)
+        
+            setDraft(slice.map(q => ({ ...q, choices: [...q.choices] })))
         }
-        const name = sessionStorage.getItem('pdfName')
-        if (name) setFileName(name)
-    }, [])
+    }, [data])
 
-    useEffect(() => {
-        if (isEditing) {
-            sessionStorage.setItem('pdf_quiz', JSON.stringify(draftQs))
+    const isUnchanged = useMemo(() => {
+        return JSON.stringify(draft) === JSON.stringify(qs)
+    }, [draft, qs])
+
+    const handleUpdate = async () => {
+        if (editing) return
+        const ok = await update(draft)
+        if (ok) {
+            setQs(draft)
+            setEditing(false)
         }
-    }, [draftQs, isEditing])
-
-    const handleEdit = () => {
-        setDraftQs(qs.map(q => ({ ...q, choices: [...q.choices] })))
-        setIsEditing(true)
+        router.push('/quiz/start')
     }
-    const handleClose = () => {
-        setQs(draftQs)
-        setIsEditing(false)
+    const updateQuestion = (i: number, t: string) => {
+        const c = [...draft]; c[i].question = t; setDraft(c)
     }
-
-    const handleStartQuiz = () => {
-        save('quiz', qs)
-        router.push("/quiz/start")
-    }
-
-    const updateQuestion = (idx: number, question: string) => {
-        setDraftQs(ds => {
-            const out = [...ds]
-            out[idx] = { ...out[idx], question: question }
-            return out
+    const updateChoice = (qi: number, ci: number, txt: string) => {
+        const c = draft.map((q, i) => {
+            if (i !== qi) return q
+            const ch = [...q.choices]; ch[ci] = txt
+            const ans = q.answer === q.choices[ci] ? txt : q.answer
+            return { ...q, choices: ch, answer: ans }
         })
+        setDraft(c)
     }
-    const updateChoice = (qIdx: number, cIdx: number, choice: string) => {
-        setDraftQs(ds => {
-        const out = ds.map((q, i) => {
-            if (i !== qIdx) return q
-            const newChoices = [...q.choices]
-            const oldChoice = newChoices[cIdx]
-            newChoices[cIdx] = choice
-            const newAnswer = q.answer === oldChoice ? choice : q.answer
-            return { ...q, choices: newChoices, answer: newAnswer }
-        })
-        return out
-        })
+    const updateAnswer = (i: number, ans: string) => {
+        const c = [...draft]; c[i].answer = ans; setDraft(c)
     }
-    const updateAnswer = (qIdx: number, answer: string) => {
-        setDraftQs(ds => {
-            const out = [...ds]
-            out[qIdx] = { ...out[qIdx], answer: answer }
-            return out
-        })
-    }
+    
+    if (loading) return <div className="p-8 text-white">Loading…</div>
 
     return (
         <div className="bg-[#0D1117] min-h-screen flex flex-col">
@@ -86,35 +67,41 @@ export default function QuizPage() {
                     {fileName}
                 </h2>
                 <div className="mt-4 md:mt-0 md:ml-auto flex space-x-2 items-center">
-                    {!isEditing && (
+                    {!editing && (
                         <>
                             <Icons.PencilSquareIcon
                                 className="w-6 h-6 cursor-pointer text-[#D1D5DB]"
-                                onClick={handleEdit}
+                                onClick={() => setEditing(true)}
                             />
                             <Button
                                 className="bg-[#3B82F6]"
-                                onClick={handleStartQuiz}
-                                disabled={saving}
+                                onClick={handleUpdate}
+                                disabled={editing}
                             >
-                                {saving ? 'Saving…' : 'Start Quiz'}
+                                { editing ? isUnchanged ? 'No changes' : 'Update': 'Start Quiz'}
                             </Button>
                         </>
                     )}
-                    {isEditing && (
+                    {editing && (
                         <>
                             <Icons.XMarkIcon
                                 className="w-6 h-6 cursor-pointer text-[#D1D5DB]"
-                                onClick={handleClose}
+                                onClick={() => setEditing(false)}
                             />
                         </>
                     )}
                 </div>
             </div>
 
-            {(isEditing ? draftQs : qs).map((q, i) => (
+            <p className="text-sm text-gray-400 mb-6">
+                {data
+                    ? 'This Quiz is already in your database. Editing and clicking “Update” will overwrite the existing record (it won’t create a duplicate).'
+                    : 'No Quiz found yet—editing and clicking “Update” will create it.'}
+            </p>
+
+            {(editing ? draft : qs).map((q, i) => (
             <div key={i} className="bg-[#D1D5DB] text-[#0F172A] rounded-xl p-6 space-y-4">
-                {isEditing ? (
+                {editing ? (
                 <>
                     <div>
                     <label className="block font-semibold text-sm mb-1">
@@ -162,12 +149,12 @@ export default function QuizPage() {
                 ) : (
                 <>
                     <h3 className="font-semibold mb-2">
-                    Q{i + 1}: {q.question}
+                        Q{i + 1}: {q.question}
                     </h3>
                     <ul className="list-disc list-inside mb-2">
-                    {q.choices.map((c, j) => (
-                        <li key={j}>{c}</li>
-                    ))}
+                        {q.choices.map((c, j) => (
+                            <li key={j}>{c}</li>
+                        ))}
                     </ul>
                     <p className="text-[#10B981]">Answer: {q.answer}</p>
                 </>

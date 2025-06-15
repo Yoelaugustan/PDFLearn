@@ -63,8 +63,8 @@ export default function FlashcardsPlayPage() {
               className="absolute inset-0 bg-[#D1D5DB] text-[#0F172A] p-6 rounded-xl overflow-auto"
               style={{ backfaceVisibility: 'hidden' }}
             >
-              <div className='h-full'>
-                <p className="whitespace-pre-wrap">{card.front}</p>
+              <div className='flex h-full items-center justify-center'>
+                <p className="whitespace-pre-wrap text-center">{card.front}</p>
               </div>
             </div>
             <div
@@ -74,8 +74,8 @@ export default function FlashcardsPlayPage() {
                 transform: 'rotateY(180deg)'
               }}
             >
-              <div className='h-full'>
-                <p className="whitespace-pre-wrap">{card.back}</p>
+              <div className='flex h-full items-center justify-center'>
+                <p className="whitespace-pre-wrap text-center">{card.back}</p>
               </div>
             </div>
           </div>
