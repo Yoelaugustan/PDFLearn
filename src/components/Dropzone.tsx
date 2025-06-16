@@ -8,7 +8,7 @@ import { usePdfScanner } from '@/hooks/usePDFScanner';
 import { useDocumentUpload } from '@/hooks/useDocumentUpload'
 import Image from 'next/image';
 
-export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
+export default function Dropzone({onFileSelected}: DropzoneProps) {
   const [file, setFile] = useState<File | null>(null)
   const [scanFile, setScanFile] = useState<File | null>(null)
   const hasUploadedRef = useRef(false)
