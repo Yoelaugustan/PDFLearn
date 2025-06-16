@@ -41,21 +41,21 @@ export type HistoryRow = {
     documents: { name: string }
 }
 
-type SummaryData = {
+export type SummaryData = {
     id: string
     document_id: string
     summary_text: string
     created_at: string
 }
 
-type QuizData = {
+export type QuizData = {
     id: string
     document_id: string
     questions: Q[]
     created_at: string
 }
 
-type FlashcardsData = {
+export type FlashcardsData = {
     id: string
     document_id: string
     cards: Card[]

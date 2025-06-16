@@ -4,12 +4,12 @@ import Menu from '@/components/Menu'
 import Footer from '@/components/footer'
 import { Button } from '@/components/ui/button'
 import * as Icons from '@heroicons/react/24/solid'
-import { Q } from '@/lib/types'
+import { Q, QuizData } from '@/lib/types'
 import { useRouter } from 'next/navigation'
 import { useGenerated } from '@/hooks/useFetchGenerated'
 
 export default function QuizPage() {
-    const { data, fileName, loading, update } = useGenerated<{ questions: Q[] }>('quiz')
+    const { data, fileName, loading, update } = useGenerated<QuizData>('quiz')
     const [qs, setQs] = useState<Q[]>([])
     const [draft, setDraft] = useState<Q[]>([])
     const [editing, setEditing] = useState(false)

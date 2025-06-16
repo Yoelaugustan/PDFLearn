@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button'
 import * as Icons from '@heroicons/react/24/solid'
 import { useRouter } from 'next/navigation'
 import { useGenerated } from '@/hooks/useFetchGenerated'
+import { SummaryData } from '@/lib/types'
 
 export default function SummaryPage() {
-    const { data, fileName, loading, update } = useGenerated<{ summary_text: string }>('summary')
+    const { data, fileName, loading, update } = useGenerated<SummaryData>('summary')
     const [isEditing, setIsEditing] = useState(false)
     const [draft, setDraft] = useState<string>('')
     const router = useRouter()

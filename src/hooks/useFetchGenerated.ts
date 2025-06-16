@@ -14,7 +14,7 @@ function getTableForMethod(method: Method) {
     }
 }
 
-export function useGenerated<T = GeneratedData>(method: Method) {
+export function useGenerated<T extends { id: string } = GeneratedData>(method: Method) {
     const table = getTableForMethod(method)
     const [data, setData] = useState<T | null>(null)
     const [fileName, setFileName] = useState<string>('') 

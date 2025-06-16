@@ -13,7 +13,7 @@ export default function Dropzone({onFileSelected}: DropzoneProps) {
   const [scanFile, setScanFile] = useState<File | null>(null)
   const hasUploadedRef = useRef(false)
 
-  const { progress, text, done, error } = usePdfScanner(scanFile)
+  const { progress, text, done, error } = usePdfScanner(scanFile!)
   const { uploadDocument } = useDocumentUpload()
 
 

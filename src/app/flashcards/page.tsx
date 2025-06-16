@@ -5,11 +5,11 @@ import Footer from '@/components/footer'
 import { Button } from '@/components/ui/button'
 import * as Icons from '@heroicons/react/24/solid'
 import { useRouter } from 'next/navigation'
-import { Card } from '@/lib/types'
+import { Card, FlashcardsData } from '@/lib/types'
 import { useGenerated } from '@/hooks/useFetchGenerated'
 
 export default function FlashcardsPage() {
-    const { data, fileName, loading, update } = useGenerated<{ cards: Card[] }>('flashcards')
+    const { data, fileName, loading, update } = useGenerated<FlashcardsData>('flashcards')
     const [cards, setCards] = useState<Card[]>([])
     const [draftCards, setDraftCards] = useState<Card[]>([])
     const [isEditing, setIsEditing] = useState(false)
