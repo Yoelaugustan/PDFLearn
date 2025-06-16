@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 import { useGenerated } from '@/hooks/useFetchGenerated'
 
 export default function QuizPage() {
-    const { data, fileName, loading, update } = useGenerated('quiz')
+    const { data, fileName, loading, update } = useGenerated<{ questions: Q[] }>('quiz')
     const [qs, setQs] = useState<Q[]>([])
     const [draft, setDraft] = useState<Q[]>([])
     const [editing, setEditing] = useState(false)

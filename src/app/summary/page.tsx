@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useGenerated } from '@/hooks/useFetchGenerated'
 
 export default function SummaryPage() {
-    const { data, fileName, loading, update } = useGenerated('summary')
+    const { data, fileName, loading, update } = useGenerated<{ summary_text: string }>('summary')
     const [isEditing, setIsEditing] = useState(false)
     const [draft, setDraft] = useState<string>('')
     const router = useRouter()
