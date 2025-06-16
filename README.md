@@ -34,4 +34,4 @@ Built with Next.js, Supabase, and Hugging Face’s Mistral-7B, PDFLearn is ideal
 ---
 
 ## Visit The Web
-
+https://pdf-learn-cfdluifhd-yoelaugustans-projects.vercel.app
