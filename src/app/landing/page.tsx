@@ -1,11 +1,12 @@
 'use client'
 import React from 'react'
 import Menu from '@/components/Menu'
-import Dropzone from '@/components/Dropzone'
 import Card from '@/components/card'
 import * as Icons from '@heroicons/react/24/solid'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/footer'
+import dynamic from 'next/dynamic'
+const Dropzone = dynamic(() => import('@/components/Dropzone'), { ssr: false })
 
 export default function Landing() {
   const features = [
