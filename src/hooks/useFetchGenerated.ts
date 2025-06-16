@@ -100,7 +100,7 @@ export function useGenerated<T extends { id: string } = GeneratedData>(method: M
 export function useFetchHistory() {
     const [history, setHistory] = useState<HistoryEntry[]>([])
     const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string|null>(null)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         let isCancelled = false
@@ -113,34 +113,37 @@ export function useFetchHistory() {
                     error: authError
                 } = await supabase.auth.getUser()
 
-                if (authError || !user) {
-                    throw authError || new Error('User not authenticated')
-                }
+                if (authError || !user) throw authError || new Error('User not authenticated')
 
-                const { data, error } = await supabase
+                const { data: historyRows, error: historyError } = await supabase
                     .from('history')
-                    .select(`
-                        id,
-                        document_id,
-                        method,
-                        created_at,
-                        documents(name)
-                    `)
+                    .select('id, document_id, method, created_at')
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false })
 
-                if (error) throw error
+                if (historyError) throw historyError
+                if (!historyRows) return
 
-                if (!isCancelled && data) {
-                    const list = data.map((row: HistoryRow) => ({
-                        id: row.id,
-                        document_id: row.document_id,
-                        method: row.method,
-                        created_at: row.created_at,
-                        name: row.documents.name
-                    }))
+                const docIds = historyRows.map(h => h.document_id)
+                const { data: docs, error: docErr } = await supabase
+                    .from('documents')
+                    .select('id, name')
+                    .in('id', docIds)
+
+                if (docErr) throw docErr
+                const docMap = new Map(docs?.map(doc => [doc.id, doc.name]))
+
+                const list: HistoryEntry[] = historyRows.map(row => ({
+                    id: row.id,
+                    document_id: row.document_id,
+                    method: row.method,
+                    name: docMap.get(row.document_id) ?? 'Unknown',
+                }))
+
+                if (!isCancelled) {
                     setHistory(list)
                 }
+
             } catch (e: unknown) {
                 if (!isCancelled) {
                     const message = e instanceof Error ? e.message : 'Unexpected error'
