@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { InferenceClient } from '@huggingface/inference'
 import JSON5 from 'json5'
+import { OutputType } from '@/lib/types'
 
 const HF_TOKEN = process.env.NEXT_PUBLIC_HF_TOKEN!
 const MODEL = 'mistralai/mistral-7b-instruct-v0.2'
@@ -9,7 +10,7 @@ type Method = 'summary' | 'quiz' | 'flashcards'
 
 export function useGenerateMethod() {
     const [loading, setLoading] = useState(false)
-    const [output, setOutput] = useState<any>(null)
+    const [output, setOutput] = useState<OutputType>(null)
     const [error, setError] = useState<string | null>(null)
 
     const client = new InferenceClient(HF_TOKEN)
@@ -76,23 +77,28 @@ export function useGenerateMethod() {
                 .replace(/\/\/.*$/gm, '')
                 .replace(/,\s*([\]}])/g, '$1')
 
-            let parsed: any
+            let parsed: OutputType
             try {
                 parsed = JSON.parse(jsonText)
             } catch (e1) {
                 console.warn('JSON.parse failed, falling back to JSON5:', e1)
                 try {
-                parsed = JSON5.parse(jsonText)
+                    parsed = JSON5.parse(jsonText)
                 } catch (e2) {
-                console.error('JSON5.parse also failed:', e2, '\nCleaned text:', jsonText)
-                throw new Error('Invalid JSON after cleaning')
+                    console.error('JSON5.parse also failed:', e2, '\nCleaned text:', jsonText)
+                    throw new Error('Invalid JSON after cleaning')
                 }
             }
 
             setOutput(parsed)
-        } catch (e: any) {
-            console.error('generation error', e)
-            setError(e.message)
+        } catch (e: unknown) {
+            if (e instanceof Error) {
+                console.error('generation error', e)
+                setError(e.message)
+            } else {
+                console.error('generation error (non-Error)', e)
+                setError('Unknown error occurred')
+            }
         } finally {
             setLoading(false)
         }

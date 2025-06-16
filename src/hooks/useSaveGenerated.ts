@@ -1,7 +1,7 @@
 'use client'
 import { useState, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { Method } from '@/lib/types'
+import { Method, UpdatePayload } from '@/lib/types'
 
 export function useSaveGenerated() {
     const supabase = createClient()
@@ -9,7 +9,7 @@ export function useSaveGenerated() {
     const [error, setError] = useState<string|null>(null)
 
     const save = useCallback(
-        async (method: Method, payload: any) => {
+        async (method: Method, payload: UpdatePayload) => {
         setSaving(true)
         setError(null)
 
@@ -33,7 +33,11 @@ export function useSaveGenerated() {
                 table = 'summaries'
                 row = {
                     document_id,
-                    summary_text: (payload.summary ?? payload) as string,
+                    summary_text: typeof payload === 'string'
+                        ? payload
+                        : (typeof payload === 'object' && 'summary' in payload && typeof payload.summary === 'string'
+                            ? payload.summary
+                            : '')
                 }
                 break
 
@@ -66,9 +70,13 @@ export function useSaveGenerated() {
             if (histErr) throw histErr
 
             return true
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('save error', e)
-            setError(e.message)
+            if (e instanceof Error) {
+                setError(e.message)
+            } else {
+                setError('Unknown error')
+            }
             return false
         } finally {
             setSaving(false)

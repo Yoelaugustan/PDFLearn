@@ -1,5 +1,5 @@
 'use client'
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {useDropzone} from 'react-dropzone';
 import * as Icons from '@heroicons/react/24/solid'
 import { DropzoneProps } from '@/lib/types';
@@ -11,18 +11,20 @@ import Image from 'next/image';
 export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
   const [file, setFile] = useState<File | null>(null)
   const [scanFile, setScanFile] = useState<File | null>(null)
+  const hasUploadedRef = useRef(false)
 
   const { progress, text, done, error } = usePdfScanner(scanFile)
   const { uploadDocument } = useDocumentUpload()
 
 
   useEffect(() => {
-    if (done && scanFile) {
+    if (done && scanFile && !hasUploadedRef.current) {
+      hasUploadedRef.current = true
       sessionStorage.setItem('pdfText', text)
       uploadDocument(scanFile, text)
       sessionStorage.setItem('pdfName', scanFile.name)
     }
-  }, [done, scanFile, onContinue, text, uploadDocument])
+  }, [done, scanFile, text, uploadDocument])
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -113,7 +115,7 @@ export default function Dropzone({onFileSelected, onContinue}: DropzoneProps) {
 
       {scanFile && !done && (
         <div className="fixed inset-0 bg-black/50 z-50 flex flex-col items-center justify-center p-4">
-          <Image src='/Scanning.gif' alt="Scanning…" className="w-24 h-24 mb-6" />
+          <Image src='/Scanning.gif' alt="Scanning…" className="mb-6" width={100} height={100}/>
           <div className="w-full max-w-md bg-gray-700 rounded-full h-2 overflow-hidden mb-2">
             <div
               className="h-full bg-green-500 transition-all"

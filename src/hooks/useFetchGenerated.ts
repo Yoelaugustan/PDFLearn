@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import type { HistoryEntry, Method } from '@/lib/types'
+import type { GeneratedData, HistoryEntry, HistoryRow, Method, UpdatePayload } from '@/lib/types'
 
 const supabase = createClient()
 
@@ -16,7 +16,7 @@ function getTableForMethod(method: Method) {
 
 export function useGenerated(method: Method) {
     const table = getTableForMethod(method)
-    const [data, setData] = useState<Record<string, any> | null>(null)
+    const [data, setData] = useState<GeneratedData | null>(null)
     const [fileName, setFileName] = useState<string>('') 
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string|null>(null)
@@ -53,14 +53,19 @@ export function useGenerated(method: Method) {
     }, [table])
 
     const update = useCallback(
-        async (payload: any) => {
+        async (payload: UpdatePayload) => {
             if (!data?.id) {
                 throw new Error('No existing record to update')
             }
             setLoading(true)
             try {
-                const changes: Record<string, any> = {}
-                if (method === 'summary') changes.summary_text = payload.summary ?? payload
+                const changes: Record<string, unknown> = {}
+                if (method === 'summary') {
+                    const summaryPayload = payload as { summary?: string } | string
+                    changes.summary_text = typeof summaryPayload === 'object' && summaryPayload.summary 
+                        ? summaryPayload.summary 
+                        : summaryPayload
+                }
                 if (method === 'quiz') changes.questions = payload
                 if (method === 'flashcards') changes.cards = payload
 
@@ -78,8 +83,9 @@ export function useGenerated(method: Method) {
                 if (fetchErr) throw fetchErr
                 setData(fresh)
                 return true
-            } catch (e: any) {
-                setError(e.message)
+            } catch (e: unknown) {
+                const message = e instanceof Error ? e.message : 'Unknown error'
+                setError(message)
                 return false
             } finally {
                 setLoading(false)
@@ -97,33 +103,58 @@ export function useFetchHistory() {
     const [error, setError] = useState<string|null>(null)
 
     useEffect(() => {
-        setLoading(true)
-        supabase
-        .from('history')
-        .select(`
-            id,
-            document_id,
-            method,
-            created_at,
-            documents!history_document_id_fkey(name)
-        `)
-        .order('created_at', { ascending: false })
-        .then(({ data, error }) => {
-            if (error) {
-                setError(error.message)
-            } else if (data) {
-                const list = data.map((row: any) => ({
-                    id:          row.id,
-                    document_id: row.document_id,
-                    method:      row.method,
-                    created_at:  row.created_at,
-                    name:        row.documents.name as string
-                }))
-                setHistory(list)
+        let isCancelled = false
+
+        const fetchHistory = async () => {
+            setLoading(true)
+            try {
+                const {
+                    data: { user },
+                    error: authError
+                } = await supabase.auth.getUser()
+
+                if (authError || !user) {
+                    throw authError || new Error('User not authenticated')
+                }
+
+                const { data, error } = await supabase
+                    .from('history')
+                    .select(`
+                        id,
+                        document_id,
+                        method,
+                        created_at,
+                        documents(name)
+                    `)
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false })
+
+                if (error) throw error
+
+                if (!isCancelled && data) {
+                    const list = data.map((row: HistoryRow) => ({
+                        id: row.id,
+                        document_id: row.document_id,
+                        method: row.method,
+                        created_at: row.created_at,
+                        name: row.documents.name
+                    }))
+                    setHistory(list)
+                }
+            } catch (e: unknown) {
+                if (!isCancelled) {
+                    const message = e instanceof Error ? e.message : 'Unexpected error'
+                    setError(message)
+                }
+            } finally {
+                if (!isCancelled) setLoading(false)
             }
-        })
-        .then(() => setLoading(false))
+        }
+
+        fetchHistory()
+        return () => { isCancelled = true }
     }, [])
 
     return { history, loading, error }
 }
+
