@@ -14,7 +14,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-    const { login, signInWithGoogle, loading, error } = useAuthenticationActions()
+    const { login, loading, error } = useAuthenticationActions()
 
     const supabase = createClient();
     const router = useRouter();

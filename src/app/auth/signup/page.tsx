@@ -13,7 +13,7 @@ export default function SignupPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [email, setEmail] = useState('');
 
-    const { signUp, signInWithGoogle, loading, error } = useAuthenticationActions();
+    const { signUp, loading, error } = useAuthenticationActions();
 
     const handleSignUp = async () => {
         console.log('Signing up...');
