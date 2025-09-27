@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import Menu from '../../../components/Menu'
 import * as Icons from "@heroicons/react/24/solid";
-import { Google } from '@/themes/icons';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useAuthenticationActions } from '@/hooks/useAuthenticationActions';
