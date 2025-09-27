@@ -48,8 +48,7 @@ export function useAuthenticationActions() {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                // Replace this with your actual deployed URL
-                redirectTo: 'https://your-app.vercel.app/landing',
+                redirectTo: 'pdf-learn-two.vercel.app/landing',
             },
         });
 
