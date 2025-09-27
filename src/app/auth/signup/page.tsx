@@ -108,15 +108,6 @@ export default function SignupPage() {
                         }
                     </div>
                 </div>
-                <div className='flex items-center gap-3 mb-6'>
-                    <hr className='flex-1 h-px bg-[#D1D5DB]'/>
-                    <p className='text-[#D1D5DB] text-sm'>OR</p>
-                    <hr className='flex-1 h-px bg-[#D1D5DB]'/>
-                </div>
-                <div className='flex items-center gap-2 border border-[#D1D5DB] rounded-xl px-4 py-3 mb-6 cursor-pointer hover:bg-[#1F2937] transition' onClick={signInWithGoogle}>
-                    <Google className='text-[#D1D5DB] h-5 w-5'/>
-                    <p className='text-[#D1D5DB] text-base'>Signin With Google Account</p>
-                </div>
 
                 <Button 
                     className='relative bg-[#3B82F6] hover:bg-[#2563EB] text-[#0D1117] font-medium text-base py-4 w-full rounded-xl' 
