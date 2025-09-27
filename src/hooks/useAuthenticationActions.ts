@@ -47,13 +47,14 @@ export function useAuthenticationActions() {
         console.log('Signing in with Google...');
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
+            options: {
+                // Replace this with your actual deployed URL
+                redirectTo: 'https://your-app.vercel.app/landing',
+            },
         });
-
 
         if (error) {
             console.error('Google sign-in error:', error.message);
-        } else {
-            router.push('/landing');
         }
     };
 
